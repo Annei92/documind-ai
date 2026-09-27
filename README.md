@@ -1,36 +1,37 @@
 # DocuMind — AI Document Assistant
 
-DocuMind is a document question-answering application I built to explore how Retrieval-Augmented Generation (RAG) can be used to answer questions from multiple PDF documents.
+DocuMind is a project I built to learn and experiment with Retrieval-Augmented Generation (RAG).
 
-The idea is simple: upload your PDFs, ask a question, and DocuMind searches the documents for the most relevant information before generating an answer. The response is grounded in the uploaded documents and includes the source document and page so the retrieved evidence can be checked.
+The idea came from a simple problem: when working with multiple documents, finding a specific piece of information can take time. I wanted to build something where I could upload a few PDFs, ask questions in normal language, and get answers based specifically on those documents.
 
-The application runs locally using Ollama, so it does not depend on a hosted LLM API.
+DocuMind does exactly that. It searches the uploaded PDFs for relevant information, sends the most useful context to a local language model, and generates an answer. It also shows the source document and page so the answer can be checked instead of simply trusted.
 
-## What it can do
+Everything runs locally using Ollama.
 
-- Upload and search multiple PDF documents
-- Ask questions in a chat-style interface
-- Search documents using both semantic similarity and keyword matching
-- Continue a conversation with follow-up questions
-- Search a specific PDF by mentioning its filename
-- Show the document and page used to support an answer
-- Refuse questions when the uploaded documents do not contain enough information
-- Run the language model locally with Ollama
+## What DocuMind can do
 
-## How it works
+- Upload multiple PDF documents
+- Ask questions about them through a chat interface
+- Search across all uploaded documents
+- Search a particular PDF by mentioning its filename
+- Understand follow-up questions in a conversation
+- Show the document and page behind an answer
+- Avoid answering when there isn't enough evidence in the documents
+- Run the LLM locally instead of depending on a paid API
 
-DocuMind uses a RAG pipeline:
+## How I built it
 
-1. PDF text is extracted page by page.
-2. The extracted text is divided into smaller, structure-aware chunks.
-3. Each chunk is converted into an embedding using `all-MiniLM-L6-v2`.
-4. When a question is asked, DocuMind searches for the most relevant chunks.
-5. Retrieval combines semantic similarity with keyword matching.
-6. The best matching chunks are passed to a local `qwen2.5:7b` model through Ollama.
-7. The model is instructed to answer only from the retrieved document context.
-8. The relevant document and page are shown with the answer.
+The application follows a RAG pipeline.
 
-The retrieval score currently combines:
+When PDFs are uploaded, I first extract their text page by page and divide it into smaller chunks.
+
+Those chunks are converted into embeddings using `all-MiniLM-L6-v2`.
+
+When the user asks a question, DocuMind compares the question with the document chunks to find the most relevant information.
+
+I found that semantic similarity alone wasn't always ideal, especially for things like exact skills, technology names and numbers. To improve this, I combined semantic search with keyword matching.
+
+The final retrieval score uses:
 
 ```text
-75% semantic similarity + 25% keyword similarity
+75% semantic similarity + 25% keyword matching
